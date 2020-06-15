@@ -401,9 +401,6 @@ class YamlFile(db.Model):
         return response
 
 
-
-
-
 class WikiRegionFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sheet_id=db.Column(db.Integer, db.ForeignKey('project_sheet.id'))
