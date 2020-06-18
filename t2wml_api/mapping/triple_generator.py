@@ -7,7 +7,7 @@ from etk.wikidata.value import Item, Property, StringValue, URLValue, TimeValue,
     ExternalIdentifier, GlobeCoordinate
 from etk.wikidata import serialize_change_record, WDReference
 from t2wml_api.wikification.utility_functions import get_property_type, translate_precision_to_integer
-import t2wml_api.wikification.t2wml_exceptions as T2WMLExceptions
+import t2wml_api.utils.t2wml_exceptions as T2WMLExceptions
 
 def handle_property_value(attribute, sparql_endpoint):
     property_type=get_property_type(attribute["property"], sparql_endpoint)
