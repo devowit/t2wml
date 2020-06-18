@@ -6,20 +6,6 @@ from typing import Sequence, Union, Tuple, List, Dict, Any
 from string import punctuation
 from t2wml_api.utils import t2wml_exceptions as T2WMLExceptions
 
-def is_csv(file_path):
-    file_extension=Path(file_path).suffix
-    is_csv = True if file_extension.lower() == ".csv" else False
-    return is_csv
-
-def string_is_valid(text: str) -> bool:
-    def check_special_characters(text: str) -> bool:
-        return all(char in punctuation for char in str(text))
-    if text is None or check_special_characters(text):
-        return False
-    text=text.strip().lower()
-    if text in ["", "#na", "nan"]:
-        return False
-    return True
 
 def translate_precision_to_integer(precision: str) -> int:
     """
@@ -109,10 +95,18 @@ def query_wikidata_for_property_type(wikidata_property, sparql_endpoint):
 
 def add_properties_from_file(file_path):
     raise NotImplementedError
+
 def get_property_type(wikidata_property: str, sparql_endpoint: str):
-    raise NotImplementedError
+    property_type=query_wikidata_for_property_type(wikidata_property, sparql_endpoint)
+    if property_type=="Property Not Found":
+        raise ValueError("Property "+wikidata_property+" not found")
+    return property_type
+
 def get_labels_and_descriptions(items: set, sparql_endpoint: str):
-    raise NotImplementedError
+    response=dict()
+    new_items=query_wikidata_for_label_and_description(items, sparql_endpoint)
+    response.update(new_items)
+    return response
 
 '''
 from t2wml_api.wikification.wikidata_property import WikidataProperty, WikidataItem, ValueAlreadyPresentError

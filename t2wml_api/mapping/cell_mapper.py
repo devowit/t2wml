@@ -2,7 +2,6 @@ import os
 import json
 from pathlib import Path
 from collections import OrderedDict
-from t2wml_api.utils.utility_functions import string_is_valid
 from t2wml_api.parsing.yaml_parsing import TemplateParser, RegionParser, validate_yaml
 from t2wml_api.spreadsheets.sheet import Sheet
 from t2wml_api.utils.bindings import bindings, update_bindings
@@ -27,7 +26,7 @@ class Region:
                 for row in range(self.top, self.bottom+1):
                     if row not in skip_rows:
                         try:
-                            if (column, row) not in skip_cells: # and string_is_valid(str(bindings.excel_sheet[row-1][column-1])):
+                            if (column, row) not in skip_cells:
                                 self.indices[(column, row)]=True
                         except Exception as e:
                             print(e)
