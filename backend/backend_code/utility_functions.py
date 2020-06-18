@@ -11,11 +11,6 @@ from backend_code.wikidata_property import WikidataProperty, WikidataItem, Value
 from app_config import GOOGLE_CLIENT_ID
 
 
-def is_csv(file_path):
-    file_extension=Path(file_path).suffix
-    is_csv = True if file_extension.lower() == ".csv" else False
-    return is_csv
-
 def string_is_valid(text: str) -> bool:
     def check_special_characters(text: str) -> bool:
         return all(char in punctuation for char in str(text))

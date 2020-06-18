@@ -7,11 +7,11 @@ from werkzeug.utils import secure_filename
 from app_config import DEFAULT_SPARQL_ENDPOINT, UPLOAD_FOLDER, db
 from backend_code.cell_mapper import CellMapper
 from backend_code.item_table import ItemTable
-from backend_code.spreadsheets.sheet import save_and_get_sheet_names
+from backend_code.spreadsheets.caching import PandasLoader, PickleCacher
 from backend_code.spreadsheets.utilities import excel_to_json
 from backend_code.t2wml_exceptions import T2WMLException
 from backend_code.t2wml_handling import download_kgtk, generate_download_file, highlight_region, resolve_cell
-from backend_code.utility_functions import is_csv, add_properties_from_file
+from backend_code.utility_functions import add_properties_from_file
 
 
 def generate_id() -> str:
@@ -217,9 +217,7 @@ class ProjectFile(db.Model):
             return [sheet.name for sheet in self.sheets]
         return None #also for all csvs
         
-    @property
-    def is_csv(self):
-        return is_csv(self.filepath)
+
 
     @staticmethod
     def create(file, project):
@@ -238,11 +236,16 @@ class ProjectFile(db.Model):
         return pf
     
     def init_sheets(self):
-        sheet_names=save_and_get_sheet_names(self.filepath)
-        first=sheet_names[0]
-        for sheet_name in sheet_names:
-            pr = ProjectSheet(name=sheet_name, file_id=self.id, current=sheet_name==first)
-            db.session.add(pr)
+        pw=PandasLoader(self.filepath)
+        sheet_data=pw.load_file()
+        for sheet_name in sheet_data:
+            first=sheet_name
+            break
+        for sheet_name in sheet_data:
+            pc=PickleCacher(self.filepath, sheet_name)
+            pc.save_pickle(sheet_data[sheet_name])
+            ps = ProjectSheet(name=sheet_name, file_id=self.id, current=sheet_name==first)
+            db.session.add(ps)
         db.session.commit()
     
     def change_sheet(self, sheet_name):
@@ -263,9 +266,10 @@ class ProjectFile(db.Model):
     
     def tableData(self):
         data=excel_to_json(self.filepath, self.current_sheet_name)
+        pw=PandasLoader(self.filepath)
         return {
             "filename":self.name,
-            "isCSV":self.is_csv,
+            "isCSV":pw.is_csv,
             "sheetNames": self.sheet_names,
             "currSheetName": self.current_sheet_name,
             "sheetData": data
