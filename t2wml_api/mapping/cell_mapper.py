@@ -2,10 +2,10 @@ import os
 import json
 from pathlib import Path
 from collections import OrderedDict
-from backend_code.utility_functions import string_is_valid
-from backend_code.parsing.yaml_parsing import TemplateParser, RegionParser, validate_yaml
-from backend_code.spreadsheets.sheet import Sheet
-from backend_code.bindings import bindings, update_bindings
+from t2wml_api.utils.utility_functions import string_is_valid
+from t2wml_api.parsing.yaml_parsing import TemplateParser, RegionParser, validate_yaml
+from t2wml_api.spreadsheets.sheet import Sheet
+from t2wml_api.utils.bindings import bindings, update_bindings
 
 class Region:
     def __init__(self, region_data):
